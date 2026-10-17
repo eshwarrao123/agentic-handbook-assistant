@@ -1,6 +1,8 @@
 /**
- * API types mirroring docs/API_CONTRACT.md
+ * API types mirroring docs/API_CONTRACT.md §4 and §9.
  */
+
+// --- Health Diagnostics Types ---
 
 export interface VectorStoreHealth {
   status: string;
@@ -31,10 +33,74 @@ export interface HealthResponse {
   components: ComponentsHealth;
 }
 
-export interface ApiErrorDetails {
-  code: string;
+// --- Chat and Booking Types (API_CONTRACT §9) ---
+
+export type BookingStatus = 'none' | 'collecting' | 'awaiting_slot' | 'confirmed' | 'cancelled';
+
+export interface Slot {
+  slot_id: string;
+  start: string;
+  label: string;
+}
+
+export interface Citation {
+  document: string;
+  title: string;
+  page: number;
+  snippet: string;
+  chunk_id: string;
+}
+
+export interface Confirmation {
+  reference: string;
+  slot: Slot;
+  full_name: string;
+  email: string;
+  service_type: string;
+  simulated: true;
+}
+
+export interface BookingSnapshot {
+  status: BookingStatus;
+  service_type: string | null;
+  full_name: string | null;
+  email: string | null;
+  offered_slots: Slot[];
+  confirmation: Confirmation | null;
+}
+
+export interface AgentInfo {
+  status: 'ok' | 'degraded';
+  error_code: string | null;
+  intents: ('booking' | 'faq')[];
+  route: string[];
+}
+
+export interface ChatRequest {
+  thread_id?: string | null;
   message: string;
-  retryable: boolean;
-  request_id?: string;
-  details?: unknown;
+}
+
+export interface ChatResponse {
+  thread_id: string;
+  is_new_thread: boolean;
+  reply: {
+    message_id: string;
+    role: 'assistant';
+    content: string;
+    citations: Citation[];
+    created_at: string;
+  };
+  booking: BookingSnapshot;
+  agent: AgentInfo;
+}
+
+export interface ApiError {
+  error: {
+    code: string;
+    message: string;
+    retryable: boolean;
+    request_id: string;
+    details: unknown;
+  };
 }

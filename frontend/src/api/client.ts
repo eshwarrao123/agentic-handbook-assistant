@@ -3,7 +3,7 @@
  * Uses relative /api paths by default to leverage the Vite dev server proxy.
  */
 
-import type { HealthResponse } from './types';
+import type { ChatRequest, ChatResponse, HealthResponse } from './types';
 
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
@@ -56,6 +56,51 @@ export async function fetchHealth(): Promise<HealthResponse> {
     const message = error instanceof Error ? error.message : 'Unknown network failure';
     throw new ApiClientError(
       `Failed to connect to backend at ${url}. ${message}`,
+      undefined,
+      error
+    );
+  }
+}
+
+/**
+ * Send a chat message to POST /api/chat.
+ */
+export async function sendChatMessage(payload: ChatRequest): Promise<ChatResponse> {
+  const url = `${BASE_URL}/api/chat`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      let errorDetails: unknown = null;
+      try {
+        errorDetails = await response.json();
+      } catch {
+        // Non-JSON response
+      }
+      throw new ApiClientError(
+        `Chat request failed with HTTP ${response.status}: ${response.statusText}`,
+        response.status,
+        errorDetails
+      );
+    }
+
+    const data: ChatResponse = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof ApiClientError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : 'Unknown network failure';
+    throw new ApiClientError(
+      `Failed to communicate with chat API at ${url}. ${message}`,
       undefined,
       error
     );
