@@ -1,0 +1,122 @@
+/* CitationCard styles */
+
+.citations-disclosure {
+  margin-top: 0.75rem;
+}
+
+.citations-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted, #718096);
+  padding: 0.25rem 0;
+  border-radius: 4px;
+  list-style: none;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.citations-summary::-webkit-details-marker {
+  display: none;
+}
+
+.citations-summary::after {
+  content: '▾';
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+details[open] .citations-summary::after {
+  transform: rotate(-180deg);
+}
+
+.citations-summary:hover {
+  color: var(--text-secondary, #4a5568);
+}
+
+.citations-icon {
+  font-size: 0.85rem;
+}
+
+.citations-list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.citation-card {
+  background: var(--citation-bg, #f0f4f9);
+  border: 1px solid var(--citation-border, #dde3ec);
+  border-radius: 6px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+}
+
+.citation-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.citation-index {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent, #2563eb);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.citation-document {
+  font-weight: 600;
+  color: var(--text-primary, #0d1117);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.citation-page {
+  font-size: 0.75rem;
+  color: var(--text-muted, #718096);
+  background: var(--surface-3, #e8edf4);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.citation-snippet {
+  margin: 0 0 0.35rem 0;
+  padding: 0.35rem 0.6rem;
+  border-left: 2px solid var(--accent, #2563eb);
+  color: var(--text-secondary, #4a5568);
+  font-style: italic;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  background: var(--surface, #fff);
+  border-radius: 0 4px 4px 0;
+
+  /* Clamp long snippets */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.citation-meta {
+  font-size: 0.73rem;
+  color: var(--text-muted, #718096);
+  font-family: var(--mono);
+}
+
+.citation-chunk-id {
+  opacity: 0.75;
+}

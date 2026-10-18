@@ -43,6 +43,13 @@ export interface Slot {
   label: string;
 }
 
+export interface SlotsResponse {
+  service_type: string;
+  timezone: string;
+  total_available: number;
+  slots: Slot[];
+}
+
 export interface Citation {
   document: string;
   title: string;

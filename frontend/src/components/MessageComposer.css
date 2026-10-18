@@ -1,0 +1,124 @@
+/* MessageComposer styles */
+
+.composer-form {
+  padding: 0.75rem 1rem 0.5rem;
+  background: var(--surface, #ffffff);
+  border-top: 1px solid var(--border, #dde3ec);
+  flex-shrink: 0;
+}
+
+.composer-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  border: 1.5px solid var(--border, #dde3ec);
+  border-radius: 10px;
+  padding: 0.5rem 0.5rem 0.5rem 0.85rem;
+  background: var(--bg, #f5f7fa);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.composer-inner:focus-within {
+  border-color: var(--accent, #2563eb);
+  box-shadow: 0 0 0 3px var(--accent-ring, rgba(37, 99, 235, 0.2));
+  background: var(--surface, #ffffff);
+}
+
+.composer-sending {
+  opacity: 0.75;
+}
+
+.composer-disabled {
+  opacity: 0.5;
+}
+
+.composer-textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary, #0d1117);
+  min-height: 1.5rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.composer-textarea::placeholder {
+  color: var(--text-muted, #718096);
+}
+
+.composer-textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* Send button */
+.composer-send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3, #e8edf4);
+  color: var(--text-muted, #718096);
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.composer-send-btn.send-ready {
+  background: var(--accent, #2563eb);
+  color: #ffffff;
+}
+
+.composer-send-btn.send-ready:hover {
+  background: var(--accent-hover, #1d4ed8);
+  transform: scale(1.05);
+}
+
+.composer-send-btn:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+.composer-send-btn:focus-visible {
+  outline: 2px solid var(--accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Spinner inside send button */
+.send-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: block;
+}
+
+/* Hints row */
+.composer-hints {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.3rem;
+  padding: 0 0.1rem;
+}
+
+.composer-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted, #718096);
+}
+
+.composer-char-count {
+  font-size: 0.72rem;
+  color: var(--warning, #d97706);
+  font-variant-numeric: tabular-nums;
+}

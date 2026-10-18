@@ -1,0 +1,116 @@
+/* EmptyState styles */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  gap: 2rem;
+  min-height: 0;
+}
+
+.empty-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 480px;
+}
+
+.empty-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent-bg, rgba(37, 99, 235, 0.08));
+  border: 1px solid var(--accent-ring, rgba(37, 99, 235, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-logo-icon {
+  font-size: 1.75rem;
+}
+
+.empty-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #0d1117);
+  letter-spacing: -0.01em;
+}
+
+.empty-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #4a5568);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+/* Prompt chips */
+.empty-prompts {
+  width: 100%;
+  max-width: 560px;
+}
+
+.empty-prompts-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #718096);
+  margin-bottom: 0.75rem;
+}
+
+.empty-prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.5rem;
+}
+
+.prompt-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #dde3ec);
+  background: var(--surface, #ffffff);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--text-secondary, #4a5568);
+  line-height: 1.4;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.prompt-chip:hover {
+  border-color: var(--accent, #2563eb);
+  background: var(--accent-bg, rgba(37, 99, 235, 0.05));
+  color: var(--text-primary, #0d1117);
+}
+
+.prompt-chip:focus-visible {
+  outline: 2px solid var(--accent, #2563eb);
+  outline-offset: 2px;
+}
+
+.prompt-emoji {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.prompt-text {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .empty-prompts-grid {
+    grid-template-columns: 1fr;
+  }
+}

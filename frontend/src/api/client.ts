@@ -3,7 +3,7 @@
  * Uses relative /api paths by default to leverage the Vite dev server proxy.
  */
 
-import type { ChatRequest, ChatResponse, HealthResponse } from './types';
+import type { ChatRequest, ChatResponse, HealthResponse, SlotsResponse } from './types';
 
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
@@ -101,6 +101,48 @@ export async function sendChatMessage(payload: ChatRequest): Promise<ChatRespons
     const message = error instanceof Error ? error.message : 'Unknown network failure';
     throw new ApiClientError(
       `Failed to communicate with chat API at ${url}. ${message}`,
+      undefined,
+      error
+    );
+  }
+}
+
+/**
+ * Fetch available appointment slots from GET /api/slots.
+ */
+export async function fetchSlots(limit?: number): Promise<SlotsResponse> {
+  const params = limit !== undefined ? `?limit=${limit}` : '';
+  const url = `${BASE_URL}/api/slots${params}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      let errorDetails: unknown = null;
+      try {
+        errorDetails = await response.json();
+      } catch {
+        // Non-JSON response
+      }
+      throw new ApiClientError(
+        `Slots request failed with HTTP ${response.status}: ${response.statusText}`,
+        response.status,
+        errorDetails
+      );
+    }
+
+    const data: SlotsResponse = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof ApiClientError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : 'Unknown network failure';
+    throw new ApiClientError(
+      `Failed to fetch slots from ${url}. ${message}`,
       undefined,
       error
     );

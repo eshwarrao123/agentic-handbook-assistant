@@ -1,19 +1,65 @@
+/* ============================================================
+   Design System — Agentic Handbook Assistant
+   Inter font, light + dark mode, semantic tokens
+   ============================================================ */
+
 :root {
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Typography */
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Light Theme */
-  --bg: #f8fafc;
+  /* Light theme */
+  --bg:           #f5f7fa;
+  --surface:      #ffffff;
+  --surface-2:    #f0f4f9;
+  --surface-3:    #e8edf4;
+  --border:       #dde3ec;
+  --border-light: #eef2f7;
+
+  --text-primary:   #0d1117;
+  --text-secondary: #4a5568;
+  --text-muted:     #718096;
+  --text-on-accent: #ffffff;
+
+  /* Legacy aliases used by App.css */
+  --text:   #4a5568;
+  --text-h: #0d1117;
+  --bg-legacy: #f5f7fa;
   --card-bg: #ffffff;
-  --text: #475569;
-  --text-h: #0f172a;
-  --border: #e2e8f0;
-  --code-bg: #f1f5f9;
+  --code-bg: #f0f4f9;
+
+  /* Brand */
+  --accent:       #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-bg:    rgba(37, 99, 235, 0.08);
+  --accent-ring:  rgba(37, 99, 235, 0.3);
+
+  /* Semantic */
+  --success:        #059669;
+  --success-bg:     rgba(5, 150, 105, 0.09);
+  --success-border: rgba(5, 150, 105, 0.25);
+  --warning:        #d97706;
+  --warning-bg:     rgba(217, 119, 6, 0.09);
+  --warning-border: rgba(217, 119, 6, 0.25);
+  --error:          #dc2626;
+  --error-bg:       rgba(220, 38, 38, 0.07);
+  --error-border:   rgba(220, 38, 38, 0.2);
+
+  /* User bubble */
+  --user-bubble-bg:   #2563eb;
+  --user-bubble-text: #ffffff;
+
+  /* Citation card */
+  --citation-bg:     #f0f4f9;
+  --citation-border: #dde3ec;
+
+  /* Card */
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
 
   font-family: var(--sans);
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
-  color: var(--text);
+  color: var(--text-primary);
   background-color: var(--bg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -22,18 +68,51 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0f19;
-    --card-bg: #111827;
-    --text: #94a3b8;
-    --text-h: #f8fafc;
-    --border: #1e293b;
-    --code-bg: #1e293b;
+    --bg:           #0c1117;
+    --surface:      #161c27;
+    --surface-2:    #1c2434;
+    --surface-3:    #222d3f;
+    --border:       #2a3649;
+    --border-light: #222d3f;
+
+    --text-primary:   #e8edf4;
+    --text-secondary: #94a3b8;
+    --text-muted:     #64748b;
+
+    --text:   #94a3b8;
+    --text-h: #e8edf4;
+    --card-bg: #161c27;
+    --code-bg: #1c2434;
+
+    --accent:       #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-bg:    rgba(59, 130, 246, 0.12);
+    --accent-ring:  rgba(59, 130, 246, 0.35);
+
+    --success:        #10b981;
+    --success-bg:     rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.25);
+    --warning:        #f59e0b;
+    --warning-bg:     rgba(245, 158, 11, 0.1);
+    --warning-border: rgba(245, 158, 11, 0.25);
+    --error:          #f87171;
+    --error-bg:       rgba(248, 113, 113, 0.1);
+    --error-border:   rgba(248, 113, 113, 0.2);
+
+    --user-bubble-bg:   #2563eb;
+    --user-bubble-text: #ffffff;
+
+    --citation-bg:     #1c2434;
+    --citation-border: #2a3649;
+
+    --card-shadow: 0 1px 4px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15);
   }
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 16px; }
 
 body {
   margin: 0;
@@ -41,13 +120,55 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--bg);
-  color: var(--text);
+  color: var(--text-primary);
 }
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+p { margin: 0; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 code {
   font-family: var(--mono);
   background: var(--code-bg);
-  padding: 0.15em 0.35em;
+  padding: 0.1em 0.35em;
   border-radius: 4px;
-  font-size: 0.88em;
+  font-size: 0.85em;
+}
+
+/* Keyframes */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes thinking-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-5px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
