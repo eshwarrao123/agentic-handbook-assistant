@@ -54,7 +54,14 @@ def analyze_turn(state: AgentState) -> Dict[str, Any]:
         w in user_lower for w in ("handbook", "policy", "conducted", "review", "pto", "vacation", "benefits")
     )
 
-    if has_question_mark or (starts_with_wh and has_faq_keywords):
+    if has_question_mark:
+        # If user text is a compound message (e.g. booking details + question), isolate the question part
+        sentences = [s.strip() for s in re.split(r"(?<=[.?])\s+", user_text) if s.strip()]
+        q_sentences = [s for s in sentences if "?" in s or any(s.lower().startswith(w + " ") for w in FAQ_START_WORDS)]
+        faq_question = " ".join(q_sentences) if q_sentences else user_text
+        if "faq" not in intents:
+            intents.append("faq")
+    elif starts_with_wh and has_faq_keywords:
         faq_question = user_text
         if "faq" not in intents:
             intents.append("faq")

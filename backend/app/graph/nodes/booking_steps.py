@@ -80,7 +80,7 @@ def offer_slots(state: AgentState) -> Dict[str, Any]:
 
     has_preceding_reply = bool(reply_parts)
     prefix = (
-        f"Returning to your booking, {first_name} — here are the available slots:\n"
+        f"Returning to your booking, {first_name} - here are the available slots:\n"
         if has_preceding_reply and first_name
         else "Here are the available slots for your Performance Review session:\n"
     )

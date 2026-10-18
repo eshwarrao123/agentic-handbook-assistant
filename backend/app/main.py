@@ -1,8 +1,10 @@
-"""FastAPI application entrypoint for Agentic Handbook Assistant."""
-
+from contextlib import asynccontextmanager
+import logging
+import os
 import uuid
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.errors import generic_exception_handler, register_error_handlers
@@ -10,6 +12,32 @@ from app.api.routes_chat import router as chat_router
 from app.api.routes_health import router as health_router
 from app.api.routes_slots import router as slots_router
 from app.config import settings
+from app.services.chat_service import ChatService
+
+logger = logging.getLogger("app.main")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage runtime checkpointer lifecycle (TECHNICAL_DESIGN §2 & §10, D-05, AR-012)."""
+    db_path = settings.CHECKPOINT_DB_PATH
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
+    try:
+        async with AsyncSqliteSaver.from_conn_string(db_path) as checkpointer:
+            await checkpointer.setup()
+            app.state.checkpointer = checkpointer
+            app.state.chat_service = ChatService(checkpointer=checkpointer)
+            logger.info("AsyncSqliteSaver initialized successfully at %s", db_path)
+            yield
+    except Exception as exc:
+        logger.critical("Failed to initialize AsyncSqliteSaver at %s: %s", db_path, exc)
+        raise
+    finally:
+        app.state.checkpointer = None
+        app.state.chat_service = None
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
@@ -33,6 +61,7 @@ def create_app() -> FastAPI:
         version=settings.VERSION,
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     # Request ID tracing middleware (API_CONTRACT §1)

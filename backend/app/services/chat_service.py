@@ -151,5 +151,19 @@ class ChatService:
             )
 
 
-# Default singleton service instance
+# Default singleton service instance (in-memory MemorySaver, preserved for fast isolated unit tests)
 chat_service = ChatService()
+
+
+def get_chat_service(request: Optional[Any] = None) -> ChatService:
+    """Return the active ChatService instance.
+    
+    Prefers the lifespan-managed SQLite checkpointer stored on app.state (D-05, AR-012).
+    Falls back to the module-level singleton when called without a lifespan context.
+    """
+    if request is not None and hasattr(request, "app") and hasattr(request.app, "state"):
+        svc = getattr(request.app.state, "chat_service", None)
+        if svc is not None:
+            return svc
+    return chat_service
+
