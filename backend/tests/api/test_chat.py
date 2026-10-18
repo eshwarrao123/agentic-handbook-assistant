@@ -136,3 +136,38 @@ def test_forced_internal_exception_returns_500_envelope():
     assert error["message"] == "Something went wrong on our side."
     assert error["retryable"] is True
     assert "Secret database failed" not in response.text
+
+
+def test_chat_faq_returns_citations(client):
+    """Test API FAQ turn returns grounded answer with page-level citations."""
+    response = client.post("/api/chat", json={
+        "message": "How often are performance reviews conducted according to the handbook?",
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    reply = data["reply"]
+    assert "annual" in reply["content"].lower()
+    assert "Source: employee_handbook.pdf, p. 4" in reply["content"]
+    assert len(reply["citations"]) >= 1
+
+    citation = reply["citations"][0]
+    assert citation["document"] == "employee_handbook.pdf"
+    assert citation["page"] == 4
+    assert citation["chunk_id"].startswith("employee_handbook.pdf-p4-c")
+
+    # Invariant: booking state remains none
+    assert data["booking"]["status"] == "none"
+
+
+def test_chat_unanswerable_returns_not_found_without_citations(client):
+    """Test API unanswerable handbook question returns grounded not-found response with no citations."""
+    response = client.post("/api/chat", json={
+        "message": "What is the PTO policy and how many vacation days do I get?",
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    reply = data["reply"]
+    assert "couldn't find that in the Employee Handbook" in reply["content"]
+    assert reply["citations"] == []

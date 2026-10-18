@@ -19,12 +19,26 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     CORS_ORIGINS: Union[str, List[str]] = ["http://localhost:5173"]
 
-    # Storage and LLM defaults for upcoming phases
+    # Storage and LLM settings
     DATA_DIR: str = "./data"
     CHROMA_DIR: str = "./data/chroma"
     CHECKPOINT_DB_PATH: str = "./data/checkpoints.sqlite"
     LLM_PROVIDER: str = "groq"
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GOOGLE_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    LLM_TIMEOUT_SECONDS: int = 20
+    LLM_MAX_RETRIES: int = 2
     BOOKING_TIMEZONE: str = "Asia/Kolkata"
+
+    # RAG & Handbook Ingestion settings
+    HANDBOOK_URL: str = "https://raw.githubusercontent.com/example/handbook/main/employee_handbook.pdf"
+    HANDBOOK_FILENAME: str = "employee_handbook.pdf"
+    CHUNK_SIZE: int = 800
+    CHUNK_OVERLAP: int = 150
+    RETRIEVAL_TOP_K: int = 4
+    RETRIEVAL_MAX_DISTANCE: float = 0.55
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
