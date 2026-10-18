@@ -79,4 +79,14 @@ Thumbs.db
 *.swp
 *.swo
 
-docs/
+
+# Private planning documents retained locally, excluded from public submission
+/docs/PRD.md
+/docs/ARCHITECTURE.md
+/docs/TECHNICAL_DESIGN.md
+/docs/API_CONTRACT.md
+/docs/IMPLEMENTATION_PLAN.md
+/docs/TEST_PLAN.md
+/docs/LEARNING_ROADMAP.md
+/docs/ASSESSMENT_TRACEABILITY.md
+/docs/LEARNING_NOTES.md
