@@ -1,11 +1,10 @@
-/* MessageBubble styles */
+/* MessageBubble — Editorial message styling */
 
 .message-row {
   display: flex;
-  gap: 0.65rem;
-  align-items: flex-end;
+  gap: 0.75rem;
+  align-items: flex-start;
   animation: fade-in 0.2s ease-out;
-  padding: 0.2rem 0;
 }
 
 .message-row-user {
@@ -19,39 +18,44 @@
 
 /* Avatar */
 .message-avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 700;
   flex-shrink: 0;
-  align-self: flex-end;
+  border: 1px solid var(--border);
 }
 
 .user-avatar {
-  background: var(--surface-3, #e8edf4);
-  color: var(--text-muted, #718096);
+  background: var(--surface-alt);
+  color: var(--text-tertiary);
 }
 
 .assistant-avatar {
-  background: var(--accent, #2563eb);
-  color: #fff;
+  background: var(--knowledge-bg);
+  color: var(--knowledge);
+  border-color: var(--knowledge-border);
 }
 
 .error-avatar {
-  background: var(--error-bg, rgba(220, 38, 38, 0.1));
-  color: var(--error, #dc2626);
-  border: 1px solid var(--error-border);
+  background: var(--error-bg);
+  color: var(--error);
+  border-color: var(--error-border);
 }
 
-/* Message body wraps bubble + citations + booking */
+.avatar-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Message body */
 .message-body {
   display: flex;
   flex-direction: column;
-  max-width: min(75%, 640px);
+  flex: 1;
+  max-width: 720px;
   min-width: 0;
 }
 
@@ -59,80 +63,96 @@
   align-items: flex-end;
 }
 
-.message-row-assistant .message-body,
-.message-row-error .message-body {
-  align-items: flex-start;
-}
-
 /* Bubble */
 .message-bubble {
-  padding: 0.65rem 0.9rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  padding: 0.875rem 1.125rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
   line-height: 1.65;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
 .bubble-user {
-  background: var(--user-bubble-bg, #2563eb);
-  color: var(--user-bubble-text, #ffffff);
-  border-radius: 12px 12px 4px 12px;
+  background: var(--text-primary);
+  color: var(--surface);
+  border: 1px solid var(--text-primary);
+  max-width: 85%;
 }
 
 .bubble-assistant {
-  background: var(--surface, #ffffff);
-  color: var(--text-primary, #0d1117);
-  border: 1px solid var(--border, #dde3ec);
-  border-radius: 12px 12px 12px 4px;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
 }
 
 .bubble-error {
-  background: var(--error-bg, rgba(220, 38, 38, 0.07));
-  color: var(--error, #dc2626);
-  border: 1px solid var(--error-border, rgba(220, 38, 38, 0.2));
-  border-radius: 12px 12px 12px 4px;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
   font-size: 0.875rem;
+  width: 100%;
 }
 
 /* Thinking indicator */
 .thinking-indicator {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0.55rem 0.75rem;
-  background: var(--surface, #ffffff);
-  border: 1px solid var(--border, #dde3ec);
-  border-radius: 12px 12px 12px 4px;
+  gap: 6px;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 .thinking-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--text-muted, #718096);
+  background: var(--text-muted);
   animation: thinking-bounce 1.2s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 /* Timestamp */
 .message-time {
-  font-size: 0.72rem;
-  color: var(--text-muted, #718096);
-  margin-top: 0.25rem;
-  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.375rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.time-user {
-  text-align: right;
-}
-
-.time-assistant {
-  text-align: left;
-}
-
-/* Narrow screen adjustment */
+/* Responsive */
 @media (max-width: 480px) {
-  .message-body {
-    max-width: 88%;
+  .message-row {
+    gap: 0.5rem;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .avatar-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .message-bubble {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .bubble-user {
+    max-width: 90%;
   }
 }

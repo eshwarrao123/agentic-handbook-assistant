@@ -1,123 +1,80 @@
 /**
- * MessageComposer — multiline textarea + send button.
- * - Enter sends, Shift+Enter adds newline.
- * - Disabled while a request is in flight.
- * - Preserves user input on recoverable errors.
+ * MessageComposer — Message input with send button
  */
 
-import { useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
+import { useRef, useEffect, type KeyboardEvent, type FormEvent } from 'react';
+import { Send } from 'lucide-react';
 import './MessageComposer.css';
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
+  onSend: () => void;
+  disabled: boolean;
   isSending: boolean;
-  disabled?: boolean;
-  placeholder?: string;
 }
 
-export function MessageComposer({
-  value,
-  onChange,
-  onSubmit,
-  isSending,
-  disabled = false,
-  placeholder = 'Ask a handbook question or start a booking…',
-}: Props) {
+export function MessageComposer({ value, onChange, onSend, disabled, isSending }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea as content grows
   useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`;
+    }
   }, [value]);
 
-  const canSubmit = value.trim().length > 0 && !isSending && !disabled;
-
-  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (canSubmit) onSubmit();
+      if (value.trim() && !disabled && !isSending) {
+        onSend();
+      }
     }
-  }
+  };
 
-  function handleSubmit(e: FormEvent) {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (canSubmit) onSubmit();
-  }
+    if (value.trim() && !disabled && !isSending) {
+      onSend();
+    }
+  };
+
+  const canSend = value.trim().length > 0 && !disabled && !isSending;
 
   return (
-    <form
-      className="composer-form"
-      onSubmit={handleSubmit}
-      aria-label="Message composer"
-      noValidate
-    >
-      <div className={`composer-inner ${isSending ? 'composer-sending' : ''} ${disabled ? 'composer-disabled' : ''}`}>
-        <textarea
-          id="chat-input"
-          ref={textareaRef}
-          className="composer-textarea"
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          aria-label="Your message"
-          disabled={isSending || disabled}
-          rows={1}
-          maxLength={2000}
-          autoComplete="off"
-          spellCheck={true}
-        />
-
+    <div className="message-composer">
+      <form onSubmit={handleSubmit} className="composer-container">
+        <div className="composer-input-wrapper">
+          <textarea
+            ref={textareaRef}
+            className="composer-textarea"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about the handbook or request an appointment..."
+            disabled={disabled}
+            aria-label="Message input"
+            rows={1}
+          />
+          <div className="composer-hint">
+            Press Enter to send, Shift+Enter for new line
+          </div>
+        </div>
         <button
-          id="send-btn"
           type="submit"
-          className={`composer-send-btn ${canSubmit ? 'send-ready' : ''}`}
-          disabled={!canSubmit}
-          aria-label={isSending ? 'Sending…' : 'Send message'}
-          title={isSending ? 'Sending…' : 'Send (Enter)'}
+          className={`composer-send-btn ${canSend ? 'send-ready' : ''}`}
+          disabled={!canSend}
+          aria-label="Send message"
         >
           {isSending ? (
             <span className="send-spinner" aria-hidden="true" />
           ) : (
-            <SendIcon />
+            <Send className="send-icon" aria-hidden="true" />
           )}
         </button>
-      </div>
-
-      <div className="composer-hints">
-        <span className="composer-hint">Enter to send · Shift+Enter for new line</span>
-        {value.length > 1800 && (
-          <span className="composer-char-count" aria-live="polite">
-            {value.length}/2000
-          </span>
-        )}
-      </div>
-    </form>
-  );
-}
-
-function SendIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        d="M14.5 8L1.5 2L4 8L1.5 14L14.5 8Z"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="0.5"
-        strokeLinejoin="round"
-      />
-    </svg>
+      </form>
+    </div>
   );
 }

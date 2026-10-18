@@ -1,8 +1,8 @@
 /**
- * CitationCard — renders a single RAG citation from the API response.
- * Structured data from reply.citations[]; never invents source names or pages.
+ * CitationCard — renders RAG citations with source metadata
  */
 
+import { FileText } from 'lucide-react';
 import type { Citation } from '../api/types';
 import './CitationCard.css';
 
@@ -19,14 +19,14 @@ export function CitationCard({ citation, index }: Props) {
           [{index + 1}]
         </span>
         <span className="citation-document">{citation.title || citation.document}</span>
-        <span className="citation-page">p.&nbsp;{citation.page}</span>
+        <span className="citation-page">Page {citation.page}</span>
       </div>
       {citation.snippet && (
         <blockquote className="citation-snippet">{citation.snippet}</blockquote>
       )}
       <div className="citation-meta">
         <span className="citation-chunk-id" title={`Chunk: ${citation.chunk_id}`}>
-          {citation.document}
+          {citation.chunk_id}
         </span>
       </div>
     </div>
@@ -43,7 +43,7 @@ export function CitationList({ citations }: CitationsProps) {
   return (
     <details className="citations-disclosure">
       <summary className="citations-summary">
-        <span className="citations-icon" aria-hidden="true">📄</span>
+        <FileText className="citations-icon" aria-hidden="true" />
         {citations.length === 1 ? '1 source' : `${citations.length} sources`}
       </summary>
       <div className="citations-list" role="list" aria-label="Sources">

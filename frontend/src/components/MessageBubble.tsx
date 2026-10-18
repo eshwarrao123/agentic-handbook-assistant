@@ -1,28 +1,21 @@
 /**
- * MessageBubble — renders a single conversation message.
- * Handles user messages, assistant messages (with citations and booking),
- * thinking indicator, and error messages.
+ * MessageBubble — renders user and assistant messages with citations and booking panels
  */
 
+import { User, Bot, AlertCircle } from 'lucide-react';
 import type { Citation, BookingSnapshot } from '../api/types';
 import { CitationList } from './CitationCard';
 import { BookingPanel } from './BookingPanel';
 import './MessageBubble.css';
 
-export type MessageRole = 'user' | 'assistant' | 'error';
-
 export interface Message {
   id: string;
-  role: MessageRole;
+  role: 'user' | 'assistant' | 'error';
   content: string;
+  createdAt?: string;
+  isThinking?: boolean;
   citations?: Citation[];
   booking?: BookingSnapshot;
-  /** ISO timestamp */
-  createdAt?: string;
-  /** Set when this is a transient error message */
-  isError?: boolean;
-  /** Set to true while assistant is replying */
-  isThinking?: boolean;
 }
 
 interface Props {
@@ -30,93 +23,54 @@ interface Props {
 }
 
 export function MessageBubble({ message }: Props) {
-  if (message.isThinking) {
+  const { role, content, isThinking, citations, booking, createdAt } = message;
+
+  if (isThinking) {
     return (
-      <div className="message-row message-row-assistant" role="status" aria-label="Assistant is thinking">
-        <div className="message-avatar assistant-avatar" aria-hidden="true">A</div>
+      <div className="message-row message-row-assistant">
+        <div className="message-avatar assistant-avatar">
+          <Bot className="avatar-icon" aria-hidden="true" />
+        </div>
         <div className="message-body">
-          <div className="thinking-indicator" aria-hidden="true">
-            <span className="thinking-dot" style={{ animationDelay: '0ms' }} />
-            <span className="thinking-dot" style={{ animationDelay: '160ms' }} />
-            <span className="thinking-dot" style={{ animationDelay: '320ms' }} />
+          <div className="thinking-indicator" aria-label="Thinking">
+            <div className="thinking-dot" />
+            <div className="thinking-dot" />
+            <div className="thinking-dot" />
           </div>
         </div>
       </div>
     );
   }
 
-  const isUser = message.role === 'user';
-  const isError = message.role === 'error' || message.isError;
+  const rowClass = `message-row message-row-${role}`;
+  const bubbleClass = `message-bubble bubble-${role}`;
 
   return (
-    <div
-      className={`message-row message-row-${isUser ? 'user' : isError ? 'error' : 'assistant'}`}
-      role="listitem"
-    >
-      {!isUser && (
-        <div
-          className={`message-avatar ${isError ? 'error-avatar' : 'assistant-avatar'}`}
-          aria-hidden="true"
-        >
-          {isError ? '!' : 'A'}
-        </div>
-      )}
-
+    <div className={rowClass}>
+      <div className={`message-avatar ${role}-avatar`}>
+        {role === 'user' && <User className="avatar-icon" aria-hidden="true" />}
+        {role === 'assistant' && <Bot className="avatar-icon" aria-hidden="true" />}
+        {role === 'error' && <AlertCircle className="avatar-icon" aria-hidden="true" />}
+      </div>
       <div className="message-body">
-        <div className={`message-bubble ${isUser ? 'bubble-user' : isError ? 'bubble-error' : 'bubble-assistant'}`}>
-          <MessageContent content={message.content} />
+        <div className={bubbleClass}>
+          {content}
         </div>
-
-        {/* Citations only on assistant messages */}
-        {!isUser && !isError && message.citations && message.citations.length > 0 && (
-          <CitationList citations={message.citations} />
+        {citations && citations.length > 0 && (
+          <CitationList citations={citations} />
         )}
-
-        {/* Booking panel */}
-        {!isUser && !isError && message.booking && message.booking.status !== 'none' && (
-          <BookingPanel booking={message.booking} />
+        {booking && booking.status !== 'none' && (
+          <BookingPanel booking={booking} />
         )}
-
-        {/* Timestamp */}
-        {message.createdAt && (
-          <time
-            className={`message-time ${isUser ? 'time-user' : 'time-assistant'}`}
-            dateTime={message.createdAt}
-            title={message.createdAt}
-          >
-            {formatTime(message.createdAt)}
+        {createdAt && (
+          <time className="message-time" dateTime={createdAt}>
+            {new Date(createdAt).toLocaleTimeString([], { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
           </time>
         )}
       </div>
-
-      {isUser && (
-        <div className="message-avatar user-avatar" aria-hidden="true">
-          U
-        </div>
-      )}
     </div>
   );
-}
-
-/** Render message content preserving newlines */
-function MessageContent({ content }: { content: string }) {
-  const lines = content.split('\n');
-  return (
-    <>
-      {lines.map((line, i) => (
-        <span key={i}>
-          {line}
-          {i < lines.length - 1 && <br />}
-        </span>
-      ))}
-    </>
-  );
-}
-
-function formatTime(iso: string): string {
-  try {
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  } catch {
-    return '';
-  }
 }
