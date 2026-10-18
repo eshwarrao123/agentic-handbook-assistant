@@ -72,6 +72,13 @@ class Slot(BaseModel):
     label: str = Field(description="Human-readable slot label.")
 
 
+class SlotsResponse(BaseModel):
+    service_type: str = Field(default="performance_review", description="Booked service type.")
+    timezone: str = Field(default="Asia/Kolkata", description="Timezone name.")
+    total_available: int = Field(description="Total number of available slots before limit.")
+    slots: List[Slot] = Field(description="List of available slots.")
+
+
 class Citation(BaseModel):
     document: str = Field(description="Referenced file name (e.g., employee_handbook.pdf).")
     title: str = Field(description="Human-readable document title.")

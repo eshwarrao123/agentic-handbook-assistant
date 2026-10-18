@@ -1,16 +1,22 @@
 """Nodes: ask_missing_info, offer_slots, confirm_booking (TECHNICAL_DESIGN §6, Nodes 6, 7, 8).
 
-TEMPORARY DEVELOPMENT IMPLEMENTATION:
-Provides structured step logic for gathering details, offering slots, and confirming.
-Full deterministic slot resolution and tool integration are added in Phase 5.
+Authoritative step nodes for gathering details, listing available slots from BookingService,
+and confirming simulated performance review bookings.
+Invariants:
+1. Availability and confirmations are strictly validated in Python, never invented by LLM.
+2. Partial dictionary updates preserve all existing state fields.
 """
 
 from typing import Any, Dict
+from app.booking.service import get_booking_service
 from app.graph.state import AgentState
 
 
 def ask_missing_info(state: AgentState) -> Dict[str, Any]:
-    """Execute ask_missing_info node (Node 6)."""
+    """Execute ask_missing_info node (Node 6).
+    
+    Prompts user specifically for missing name, missing email, or both.
+    """
     booking = state.get("booking") or {}
     full_name = booking.get("full_name")
     email = booking.get("email")
@@ -18,16 +24,29 @@ def ask_missing_info(state: AgentState) -> Dict[str, Any]:
     reply_parts = list(state.get("reply_parts") or [])
     visited = list(state.get("nodes_visited") or []) + ["ask_missing_info"]
 
+    # If booking_update already added a validation message, keep that specific error message
+    if any("valid email" in p.lower() or "valid name" in p.lower() or "at least" in p.lower() for p in reply_parts):
+        return {
+            "reply_parts": reply_parts,
+            "nodes_visited": visited,
+        }
+
     if not full_name and not email:
-        reply_parts.append(
+        prompt = (
             "I'd be happy to help schedule a Performance Review session. "
             "May I have your full name and email address?"
         )
+        if prompt not in reply_parts:
+            reply_parts.append(prompt)
     elif not full_name:
-        reply_parts.append("Could you please provide your full name for the booking?")
+        prompt = "Could you please provide your full name for the booking?"
+        if prompt not in reply_parts:
+            reply_parts.append(prompt)
     elif not email:
         first_name = full_name.split()[0] if full_name else "there"
-        reply_parts.append(f"Thanks, {first_name}. What is your email address?")
+        prompt = f"Thanks, {first_name}. What is your email address?"
+        if prompt not in reply_parts:
+            reply_parts.append(prompt)
 
     return {
         "reply_parts": reply_parts,
@@ -36,7 +55,10 @@ def ask_missing_info(state: AgentState) -> Dict[str, Any]:
 
 
 def offer_slots(state: AgentState) -> Dict[str, Any]:
-    """Execute offer_slots node (Node 7)."""
+    """Execute offer_slots node (Node 7).
+    
+    Pulls actual available slots from BookingService and formats the numbered slot list.
+    """
     booking = state.get("booking") or {}
     full_name = booking.get("full_name") or ""
     first_name = full_name.split()[0] if full_name else ""
@@ -44,11 +66,17 @@ def offer_slots(state: AgentState) -> Dict[str, Any]:
     reply_parts = list(state.get("reply_parts") or [])
     visited = list(state.get("nodes_visited") or []) + ["offer_slots"]
 
-    sample_slots = [
-        {"slot_id": "slot-20261019-1030", "start": "2026-10-19T10:30:00+05:30", "label": "Mon, 19 Oct 2026, 10:30 AM IST"},
-        {"slot_id": "slot-20261019-1500", "start": "2026-10-19T15:00:00+05:30", "label": "Mon, 19 Oct 2026, 3:00 PM IST"},
-        {"slot_id": "slot-20261020-1030", "start": "2026-10-20T10:30:00+05:30", "label": "Tue, 20 Oct 2026, 10:30 AM IST"},
-    ]
+    svc = get_booking_service()
+    available_slots = svc.get_available_slots(limit=3)
+
+    if not available_slots:
+        reply_parts.append(
+            "There are currently no available slots for scheduling. Please check back later."
+        )
+        return {
+            "reply_parts": reply_parts,
+            "nodes_visited": visited,
+        }
 
     has_preceding_reply = bool(reply_parts)
     prefix = (
@@ -57,50 +85,81 @@ def offer_slots(state: AgentState) -> Dict[str, Any]:
         else "Here are the available slots for your Performance Review session:\n"
     )
 
-    slot_list_str = "\n".join(f"{i + 1}) {s['label']}" for i, s in enumerate(sample_slots))
-    prompt = f"{prefix}{slot_list_str}\nWhich one works best? You can reply with the option number or the day and time."
+    slot_list_str = "\n".join(f"{i + 1}) {s['label']}" for i, s in enumerate(available_slots))
+    prompt = (
+        f"{prefix}{slot_list_str}\n\n"
+        "Which one works best? You can reply with the option number (e.g. '1', '2') or the day and time."
+    )
     reply_parts.append(prompt)
 
     return {
-        "booking": {"offered_slots": sample_slots},
+        "booking": {"offered_slots": available_slots},
         "reply_parts": reply_parts,
         "nodes_visited": visited,
     }
 
 
-def confirm_booking(state: AgentState) -> Dict[str, Any]:
-    """Execute confirm_booking node (Node 8)."""
+async def confirm_booking(state: AgentState) -> Dict[str, Any]:
+    """Execute confirm_booking node (Node 8).
+    
+    Calls BookingService to reserve the slot and generate an authoritative #REV-NNNN reference.
+    """
     booking = state.get("booking") or {}
-    full_name = booking.get("full_name") or "Alex Chen"
-    email = booking.get("email") or "alex.chen@example.com"
+    full_name = booking.get("full_name") or ""
+    email = booking.get("email") or ""
+    selected_slot_id = booking.get("selected_slot_id")
 
     reply_parts = list(state.get("reply_parts") or [])
     visited = list(state.get("nodes_visited") or []) + ["confirm_booking"]
 
-    confirmed_slot = {
-        "slot_id": "slot-20261019-1500",
-        "start": "2026-10-19T15:00:00+05:30",
-        "label": "Mon, 19 Oct 2026, 3:00 PM IST",
-    }
-    reference_id = "#REV-4081"
+    svc = get_booking_service()
 
-    confirmation_text = (
-        f"Confirmed! Your Performance Review is scheduled for {confirmed_slot['label']} for {full_name}.\n"
-        f"Reference ID: {reference_id}.\n"
-        "(This is a simulated booking; no real calendar entry was created.)"
+    if not selected_slot_id:
+        reply_parts.append("No slot was selected. Please choose an available slot from the list.")
+        return {
+            "reply_parts": reply_parts,
+            "nodes_visited": visited,
+        }
+
+    # Authoritative reservation through BookingService
+    result = await svc.create_booking(
+        full_name=full_name,
+        email=email,
+        slot_id=selected_slot_id,
     )
-    reply_parts.append(confirmation_text)
 
-    booking_update_dict = {
-        "status": "confirmed",
-        "booking_reference": reference_id,
-        "confirmed_slot": confirmed_slot,
-        "selected_slot_id": None,
-        "offered_slots": [],
-    }
+    if result["ok"]:
+        confirmed_slot = result["slot"]
+        reference = result["reference"]
+        confirmation_text = (
+            f"Confirmed! Your Performance Review is scheduled for {confirmed_slot['label']} for {full_name}.\n"
+            f"Reference ID: {reference}.\n"
+            "(This is a simulated booking; no real calendar entry was created.)"
+        )
+        reply_parts.append(confirmation_text)
 
-    return {
-        "booking": booking_update_dict,
-        "reply_parts": reply_parts,
-        "nodes_visited": visited,
-    }
+        booking_update_dict = {
+            "status": "confirmed",
+            "booking_reference": reference,
+            "confirmed_slot": confirmed_slot,
+            "selected_slot_id": None,
+            "offered_slots": [],
+        }
+
+        return {
+            "booking": booking_update_dict,
+            "reply_parts": reply_parts,
+            "nodes_visited": visited,
+        }
+    else:
+        # Slot failed validation or was already taken
+        reply_parts.append(f"{result['message']}")
+        booking_update_dict = {
+            "status": "awaiting_slot",
+            "selected_slot_id": None,
+        }
+        return {
+            "booking": booking_update_dict,
+            "reply_parts": reply_parts,
+            "nodes_visited": visited,
+        }

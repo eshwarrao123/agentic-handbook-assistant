@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.api.errors import generic_exception_handler, register_error_handlers
 from app.api.routes_chat import router as chat_router
 from app.api.routes_health import router as health_router
+from app.api.routes_slots import router as slots_router
 from app.config import settings
 
 
@@ -58,6 +59,7 @@ def create_app() -> FastAPI:
     # Mount API routes
     application.include_router(health_router, prefix="/api")
     application.include_router(chat_router, prefix="/api")
+    application.include_router(slots_router, prefix="/api")
 
     return application
 
