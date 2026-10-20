@@ -23,7 +23,6 @@ Built for a Full Stack & Agentic AI Engineering internship assessment, this appl
 - [Screenshots & Evidence](#screenshots--evidence)
 - [AI Engineering Log](#ai-engineering-log)
 - [Known Limitations](#known-limitations)
-- [License](#license)
 
 ---
 
@@ -781,37 +780,3 @@ The current system does not implement slot reservation locking. Concurrent users
 
 ---
 
-## Verification Checklist
-
-**Completed as of October 18, 2026:**
-
-- [x] Backend tests: `python -m pytest -v` (77/77 passing — includes 7 new citation accuracy tests)
-- [x] Frontend lint: `npm run lint` (0 warnings)
-- [x] Frontend build: `npm run build` (TypeScript type-check passed)
-- [x] Citation accuracy fix: Verified with investigation script and regression tests
-- [x] Backend server: Running on port 8000, health check OK
-- [x] Frontend server: Running on port 5173, loads successfully
-- [ ] Playwright E2E: Tests timeout (configuration issue, not application failure)
-- [ ] Citation accuracy UI: Manual verification required (see `MANUAL_VERIFICATION_GUIDE.md`)
-- [ ] Context interleaving: Manual verification required
-- [ ] SQLite persistence: Automated test passed (`test_sqlite_persistence_across_process_restart`)
-- [ ] Responsive layout: Manual verification required
-- [ ] Evidence screenshots: Capture required (see `MANUAL_VERIFICATION_GUIDE.md`)
-
-**Manual Verification Instructions**: See `MANUAL_VERIFICATION_GUIDE.md` for detailed step-by-step instructions to verify all user journeys and capture submission screenshots.
-
----
-
-## License
-
-This project was created for educational and assessment purposes. Consult your organization's policies before reusing code or architecture in production systems.
-
----
-
-**Submission Date**: October 18, 2026
-
-**Developed By**: [Your Name]
-
-**Assessment**: Full Stack & Agentic AI Engineering Internship
-
-**Repository**: [GitHub URL]
